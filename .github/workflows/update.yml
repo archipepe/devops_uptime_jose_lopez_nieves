@@ -3,7 +3,7 @@ name: Actualizar panel
 on:
   push:
     branches:
-      - main
+      - gh-pages
   workflow_dispatch:
 
 permissions:
@@ -47,4 +47,4 @@ jobs:
           git config user.email "github-actions@github.com"
           git add index.html
           git diff --quiet || git commit -m "Actualización automática del panel"
-          git push
+          git push origin gh-pages
