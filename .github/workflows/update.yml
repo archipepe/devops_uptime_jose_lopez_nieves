@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   build:
@@ -16,13 +17,6 @@ jobs:
         with:
           persist-credentials: true
 
-      - name: Debug paths
-        run: |
-          echo "PWD:"
-          pwd
-          echo "Listing repo:"
-          ls -R .
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -31,20 +25,15 @@ jobs:
       - name: Generate index.html
         run: python src/generate_index.py
 
-      - name: Check diff after generation
-        run: |
-          echo "Git status:"
-          git status
-          echo "Diff:"
-          git diff index.html
-
-      - name: Show remote branches
-        run: git remote show origin
-
       - name: Commit changes
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add index.html
-          git diff --quiet || git commit -m "Actualización automática del panel"
-          git push origin gh-pages
+          git config --local user.name "github-actions"
+          git config --local user.email "github-actions@github.com"
+          git add --all
+          git commit -m "Actualización automática del panel"
+          
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
