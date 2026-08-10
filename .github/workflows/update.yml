@@ -1,6 +1,9 @@
 name: Actualizar panel
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -36,4 +39,4 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages
+          branch: main
