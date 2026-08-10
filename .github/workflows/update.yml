@@ -1,9 +1,8 @@
 name: Actualizar panel
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "*/1 * * * *" # Cada minuto
+    - cron: "* * * * *" # Cada minuto
 
 permissions:
   contents: write
