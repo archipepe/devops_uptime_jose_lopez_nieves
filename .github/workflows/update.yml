@@ -19,6 +19,13 @@ jobs:
         with:
           persist-credentials: true
 
+      - name: Debug paths
+        run: |
+          echo "PWD:"
+          pwd
+          echo "Listing repo:"
+          ls -R .
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -26,6 +33,13 @@ jobs:
 
       - name: Generate index.html
         run: python src/generate_index.py
+
+      - name: Check diff after generation
+        run: |
+          echo "Git status:"
+          git status
+          echo "Diff:"
+          git diff index.html
 
       - name: Commit changes
         run: |
