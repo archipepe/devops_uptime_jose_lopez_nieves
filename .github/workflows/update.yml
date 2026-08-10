@@ -2,7 +2,7 @@ name: Actualizar panel
 
 on:
   schedule:
-    - cron: "* * * * *" # Cada minuto
+    - cron: "0 * * * *" # Cada hora
 
 permissions:
   contents: write
