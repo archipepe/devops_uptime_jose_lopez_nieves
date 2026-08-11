@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 # -----------------------------
 
 YEAR = 2025
+SUCCESS_RANGE = range(200, 300)
 OUTPUT_FILE = "data_2025.csv"
 
 SITES = {
@@ -38,7 +39,7 @@ def choose_status():
     return 200
 
 def simulate_latency(status):
-    if status == 200:
+    if status in SUCCESS_RANGE:
         # Normal o degradado
         if random.random() < 0.05:  # 5% degradado
             return random.randint(2000, 4000)
@@ -89,7 +90,7 @@ def generate_year_data():
                 # -----------------------------
                 # DOWN / RECUPERACIÓN (3 errores / 3 OK)
                 # -----------------------------
-                if status != 200:
+                if status not in SUCCESS_RANGE:
                     st["errors"] += 1
                     st["oks"] = 0
                 else:
@@ -105,7 +106,7 @@ def generate_year_data():
                 # -----------------------------
                 # DEGRADACIÓN (solo códigos 200)
                 # -----------------------------
-                if status == 200:
+                if status in SUCCESS_RANGE:
                     if latency > 2000:
                         st["lat_high"] += 1
                         st["lat_low"] = 0
