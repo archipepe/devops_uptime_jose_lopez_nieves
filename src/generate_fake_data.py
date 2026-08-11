@@ -59,11 +59,24 @@ def generate_year_data():
     id_counter = 1
 
     # Estado por sitio
-    site_state = {site: {"errors": 0, "oks": 0, "down": False} for site in SITES}
+    site_state = {
+        site: {
+            "errors": 0,
+            "oks": 0,
+            "down": False,
+            "lat_high": 0,   # latencias > 2000 ms consecutivas
+            "lat_low": 0,    # latencias <= 2000 ms consecutivas
+            "degraded": False
+        }
+        for site in SITES
+    }
 
     with open(OUTPUT_FILE, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter=";")
-        writer.writerow(["id", "timestamp", "site", "status_code", "latency_ms", "down"])
+        writer.writerow([
+            "id", "timestamp", "url", "status_code",
+            "latency_ms", "down", "degraded"
+        ])
 
         while current <= end:
             for site_name, base_url in SITES.items():
@@ -71,29 +84,58 @@ def generate_year_data():
                 status = choose_status()
                 latency = simulate_latency(status)
 
-                # Actualizar estado DOWN/UP
+                st = site_state[site_name]
+
+                # -----------------------------
+                # DOWN / RECUPERACIÓN (3 errores / 3 OK)
+                # -----------------------------
                 if status != 200:
-                    site_state[site_name]["errors"] += 1
-                    site_state[site_name]["oks"] = 0
+                    st["errors"] += 1
+                    st["oks"] = 0
                 else:
-                    site_state[site_name]["oks"] += 1
-                    site_state[site_name]["errors"] = 0
+                    st["oks"] += 1
+                    st["errors"] = 0
 
-                # Caída
-                if site_state[site_name]["errors"] >= 3:
-                    site_state[site_name]["down"] = True
+                if st["errors"] >= 3:
+                    st["down"] = True
 
-                # Recuperación
-                if site_state[site_name]["oks"] >= 3:
-                    site_state[site_name]["down"] = False
+                if st["oks"] >= 3:
+                    st["down"] = False
 
+                # -----------------------------
+                # DEGRADACIÓN (solo códigos 200)
+                # -----------------------------
+                if status == 200:
+                    if latency > 2000:
+                        st["lat_high"] += 1
+                        st["lat_low"] = 0
+                    else:
+                        st["lat_low"] += 1
+                        st["lat_high"] = 0
+                else:
+                    # errores NO cuentan para degradación, reiniciamos contadores
+                    st["lat_high"] = 0
+                    st["lat_low"] = 0
+
+                # Activar degradación
+                if st["lat_high"] >= 3:
+                    st["degraded"] = True
+
+                # Recuperar degradación
+                if st["lat_low"] >= 3:
+                    st["degraded"] = False
+
+                # -----------------------------
+                # Guardar fila
+                # -----------------------------
                 writer.writerow([
                     id_counter,
                     current.strftime("%Y-%m-%d %H:%M:%S"),
                     base_url,
                     status,
                     latency,
-                    site_state[site_name]["down"]
+                    st["down"],
+                    st["degraded"]
                 ])
 
                 id_counter += 1
