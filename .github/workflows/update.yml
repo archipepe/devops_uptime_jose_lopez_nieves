@@ -36,8 +36,8 @@ jobs:
           #   "failure", "success", "neutral", "cancelled", "skipped", "timed_out", "action_required"
           # Or a workflow status:
           #   "completed", "in_progress", "queued"
-          # Use the empty string ("completed") to ignore status or conclusion in the search
-          workflow_conclusion: ""
+          # Use the empty string ("") to ignore status or conclusion in the search
+          workflow_conclusion: "completed"
           branch: main
           name: monitor-db
           repo: ${{ github.repository }}
