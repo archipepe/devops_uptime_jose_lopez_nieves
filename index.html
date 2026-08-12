@@ -14,7 +14,6 @@
         #sidebar {
             height: 100vh;
             overflow-y: auto;
-            border-right: 1px solid #ddd;
         }
         #header {
             position: sticky;
@@ -30,28 +29,54 @@
 
     <div id="header" class="p-3">
         <h2 class="mb-0">Panel de Monitorización</h2>
-        <small class="text-muted">Resumen global (Fase 2 lo rellenará)</small>
+        <small class="text-muted">Resumen global (Fase 3 lo rellenará)</small>
     </div>
+
+    <!-- BOTÓN MÓVIL -->
+    <button class="btn btn-primary d-md-none m-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarCanvas">
+        Menú
+    </button>
 
     <div class="container-fluid">
         <div class="row">
 
-            <nav id="sidebar" class="col-3 p-3">
+            <!-- SIDEBAR ESCRITORIO -->
+            <nav id="sidebar" class="col-md-3 d-none d-md-block p-3 border-end">
                 <h5>Sitios monitorizados</h5>
-                <div class="list-group" id="site-list">
-                    <a href="#" class="list-group-item list-group-item-action disabled">
-                        (Aquí aparecerán las webs)
-                    </a>
+                <div class="list-group">
+                    <a href="#site-http://www.mytesturl.com/" class="list-group-item list-group-item-action">http://www.mytesturl.com/</a>
+<a href="#site-https://simulatehttpcode.vercel.app/" class="list-group-item list-group-item-action">https://simulatehttpcode.vercel.app/</a>
+
                 </div>
             </nav>
 
-            <main class="col-9 p-4">
+            <!-- SIDEBAR MÓVIL -->
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarCanvas">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title">Sitios monitorizados</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <div class="list-group">
+                        <a href="#site-http://www.mytesturl.com/" class="list-group-item list-group-item-action">http://www.mytesturl.com/</a>
+<a href="#site-https://simulatehttpcode.vercel.app/" class="list-group-item list-group-item-action">https://simulatehttpcode.vercel.app/</a>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL DERECHO -->
+            <main class="col-md-9 p-4">
                 <h4>Selecciona un sitio para ver sus métricas</h4>
                 <p class="text-muted">En la Fase 3 y 4 se rellenará esta sección.</p>
+
+                <!-- CONTENEDORES VACÍOS POR SITIO -->
+                <div id="site-http://www.mytesturl.com/" class="mt-5"><h3>http://www.mytesturl.com/</h3><p class="text-muted">Aquí irán las métricas.</p></div><div id="site-https://simulatehttpcode.vercel.app/" class="mt-5"><h3>https://simulatehttpcode.vercel.app/</h3><p class="text-muted">Aquí irán las métricas.</p></div>
             </main>
 
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
