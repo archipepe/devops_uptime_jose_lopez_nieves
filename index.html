@@ -1,4 +1,4 @@
-HTML = """
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -30,7 +30,7 @@ HTML = """
 
     <div id="header" class="p-3">
         <h2 class="mb-0">Panel de Monitorización</h2>
-        <small class="text-muted">Resumen global (Fase 2)</small>
+        <small class="text-muted">Resumen global (Fase 2 lo rellenará)</small>
     </div>
 
     <div class="container-fluid">
@@ -55,9 +55,3 @@ HTML = """
 
 </body>
 </html>
-"""
-
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(HTML)
-
-print("index.html generado (Fase 1 completada)")
