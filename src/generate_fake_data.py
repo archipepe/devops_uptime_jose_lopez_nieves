@@ -67,7 +67,9 @@ def generate_year_data():
             "down": False,
             "lat_high": 0,   # latencias > 2000 ms consecutivas
             "lat_low": 0,    # latencias <= 2000 ms consecutivas
-            "degraded": False
+            "degraded": False,
+            "prev_down": False,
+            "prev_degraded": False
         }
         for site in SITES
     }
@@ -76,7 +78,8 @@ def generate_year_data():
         writer = csv.writer(f, delimiter=";")
         writer.writerow([
             "id", "timestamp", "url", "status_code",
-            "latency_ms", "down", "degraded"
+            "latency_ms", "down", "degraded",
+            "down_event", "degraded_event"
         ])
 
         while current <= end:
@@ -127,6 +130,12 @@ def generate_year_data():
                     st["degraded"] = False
 
                 # -----------------------------
+                # EVENTOS (transiciones)
+                # -----------------------------
+                down_event = st["down"] and not st["prev_down"]
+                degraded_event = st["degraded"] and not st["prev_degraded"]
+
+                # -----------------------------
                 # Guardar fila
                 # -----------------------------
                 writer.writerow([
@@ -136,10 +145,16 @@ def generate_year_data():
                     status,
                     latency,
                     st["down"],
-                    st["degraded"]
+                    st["degraded"],
+                    down_event,
+                    degraded_event
                 ])
 
                 id_counter += 1
+
+                # Actualizar estados previos
+                st["prev_down"] = st["down"]
+                st["prev_degraded"] = st["degraded"]
 
             current += timedelta(minutes=INTERVAL_MINUTES)
 
