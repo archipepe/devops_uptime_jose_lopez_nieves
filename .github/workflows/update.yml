@@ -25,26 +25,52 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Download artifact from another run
+        id: download-artifact
+        uses: dawidd6/action-download-artifact@v21
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}          
+          workflow_search: false
+          # Optional, the status or conclusion of a completed workflow to search for
+          # Can be one of a workflow conclusion:
+          #   "failure", "success", "neutral", "cancelled", "skipped", "timed_out", "action_required"
+          # Or a workflow status:
+          #   "completed", "in_progress", "queued"
+          # Use the empty string ("") to ignore status or conclusion in the search
+          workflow_conclusion: ""
+          branch: main
+          name: monitor-db
+          repo: ${{ github.repository }}
+          # Optional, check the workflow run to whether it has an artifact
+          # then will get the last available artifact from the previous workflow
+          # default false, just try to download from the last one
+          check_artifacts: false
+          # Optional, search for the last workflow run whose stored an artifact named as in `name` input
+          # default false
+          search_artifacts: false
+          # Optional, choose to skip unpacking the downloaded artifact(s)
+          # default false
+          skip_unpack: false
+          # Optional, choose how to exit the action if no artifact is found
+          # can be one of:
+          #  "fail", "warn", "ignore"
+          # default fail
+          if_no_artifact_found: fail
+          # Optional, choose to unpack the downloaded artifact(s) using `unzip` system utility
+          # default false
+          use_unzip: false
+          # Optional, if multiple artifacts are found with `name_is_regexp` set to `true`, merge them into one directory
+          # default false
+          merge_multiple: false
+
+      - name: Test monitor.db
+        run: python src/add_test_record.py      
+
       - name: Upload DB artifact
         uses: actions/upload-artifact@v4
         with:
           name: monitor-db
           path: ./monitor.db
-
-      # - name: Download DB artifact
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: monitor-db
-      #     path: .
-
-      - name: Test monitor.db
-        run: python src/add_test_record.py      
-
-      # - name: Upload DB artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: monitor-db
-      #     path: ./monitor.db
 
 
 
