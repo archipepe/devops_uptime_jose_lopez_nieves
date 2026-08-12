@@ -1,8 +1,10 @@
-name: Actualizar panel
+name: Actualizar métricas
 
 on:
-  schedule:
-    - cron: "0 * * * *" # Cada hora
+  # schedule:
+  #   - cron: "* * * * *" # Cada minuto
+  workflow_dispatch:
+    
 
 permissions:
   contents: write
@@ -23,18 +25,45 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Generate index.html
-        run: python src/generate_index.py
-
-      - name: Commit changes
-        run: |
-          git config --local user.name "github-actions"
-          git config --local user.email "github-actions@github.com"
-          git add --all
-          git commit -m "Actualización automática del panel"
-          
-      - name: Push changes
-        uses: ad-m/github-push-action@master
+      - name: Upload DB artifact
+        uses: actions/upload-artifact@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+          name: monitor-db
+          path: ./monitor.db
+
+      # - name: Download DB artifact
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: monitor-db
+      #     path: .
+
+      - name: Test monitor.db
+        run: python src/add_test_record.py      
+
+      - name: Upload DB artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: monitor-db
+          path: ./monitor.db
+
+
+
+
+
+
+
+      # - name: Generate index.html
+      #   run: python src/generate_index.py
+
+      # - name: Commit changes
+      #   run: |
+      #     git config --local user.name "github-actions"
+      #     git config --local user.email "github-actions@github.com"
+      #     git add index.html
+      #     git commit -m "Actualización automática del panel"
+          
+      # - name: Push changes
+      #   uses: ad-m/github-push-action@master
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     branch: gh-pages
