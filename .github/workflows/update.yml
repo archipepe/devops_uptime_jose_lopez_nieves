@@ -1,8 +1,8 @@
 name: Actualizar métricas
 
 on:
-  # schedule:
-  #   - cron: "* * * * *" # Cada minuto
+  schedule:
+    - cron: "* * * * *" # Cada minuto
   workflow_dispatch:
     
 
@@ -25,20 +25,26 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Download DB artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: monitor-db
-          path: .
-
-      - name: Test monitor.db
-        run: python src/add_test_record.py      
-
       - name: Upload DB artifact
         uses: actions/upload-artifact@v4
         with:
           name: monitor-db
           path: ./monitor.db
+
+      # - name: Download DB artifact
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: monitor-db
+      #     path: .
+
+      - name: Test monitor.db
+        run: python src/add_test_record.py      
+
+      # - name: Upload DB artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: monitor-db
+      #     path: ./monitor.db
 
 
 
