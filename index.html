@@ -1,0 +1,499 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitor de Disponibilidad</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            overflow-x: hidden;
+        }
+        #sidebar {
+            height: 100vh;
+            overflow-y: auto;
+        }
+        #header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+
+<body>
+
+    
+    <div id="header" class="p-3">
+        <h2 class="mb-0">Panel de Monitorización</h2>
+
+        <div class="mt-3">
+            <span class="badge bg-success">Disponibilidad global: 99,98%</span>
+            <span class="badge bg-primary">Latencia media global: 550,82 ms</span>
+            <span class="badge bg-warning">Caídas hoy: 0</span>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <h6>Top webs peor disponibilidad</h6>
+                <ul><li>https://simulatehttpcode.vercel.app/: 0,02%</li></ul>
+            </div>
+
+            <div class="col-md-6">
+                <h6>Top webs mayor latencia</h6>
+                <ul><li>https://simulatehttpcode.vercel.app/: 550,82 ms</li></ul>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- BOTÓN MÓVIL -->
+    <button class="btn btn-primary d-md-none m-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarCanvas">
+        Menú
+    </button>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- SIDEBAR ESCRITORIO -->
+            <nav id="sidebar" class="col-md-3 d-none d-md-block p-3 border-end">
+                <h5>Sitios monitorizados</h5>
+                <div class="list-group">
+                    <a href="#site-https://simulatehttpcode.vercel.app/" class="list-group-item list-group-item-action">https://simulatehttpcode.vercel.app/</a>
+
+                </div>
+            </nav>
+
+            <!-- SIDEBAR MÓVIL -->
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarCanvas">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title">Sitios monitorizados</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <div class="list-group">
+                        <a href="#site-https://simulatehttpcode.vercel.app/" class="list-group-item list-group-item-action">https://simulatehttpcode.vercel.app/</a>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL DERECHO -->
+            <main class="col-md-9 p-4">
+
+                <!-- CONTENEDORES VACÍOS POR SITIO -->
+                
+    <div id="site-https://simulatehttpcode.vercel.app/" class="mt-5">
+        <h3>https://simulatehttpcode.vercel.app/</h3>
+
+        <h5 class="mt-4">Disponibilidad mensual</h5>
+        <ul><li>12/2025: 99,95%</li><li>11/2025: 99,99%</li><li>10/2025: 99,97%</li><li>09/2025: 99,98%</li><li>08/2025: 99,99%</li><li>07/2025: 99,99%</li><li>06/2025: 99,98%</li><li>05/2025: 99,98%</li><li>04/2025: 99,99%</li><li>03/2025: 99,97%</li><li>02/2025: 99,97%</li><li>01/2025: 99,98%</li></ul>
+
+        <h5 class="mt-4">Disponibilidad anual</h5>
+        <ul><li>2025: 99,98%</li></ul>
+
+        <h5 class="mt-4">Latencia</h5>
+        <p>Media: 550,82 ms</p>
+        <p>P95: 800 ms</p>
+        <p>P99: 3598 ms</p>
+
+        <h5 class="mt-4">Estado</h5>
+        <p>Tiempo caído total: 114 minutos</p>
+        <p>Tiempo degradado total: 213 minutos</p>
+
+        <img src="assets/https___simulatehttpcode_vercel_app__disp.png" class="img-fluid mt-3 rounded border">
+        <img src="assets/https___simulatehttpcode_vercel_app__latencia.png" class="img-fluid mt-3 rounded border">
+        <img src="assets/https___simulatehttpcode_vercel_app__eventos.png" class="img-fluid mt-3 rounded border">
+
+        <h5 class="mt-4">Eventos</h5>
+        <table class="table table-sm table-stripped">
+            <thead>
+                <tr class="table-secondary">
+                    <th>Fecha y hora</th>
+                    <th class="text-end">Código</th>
+                    <th class="text-end">Latencia</th>
+                    <th class="text-center">Evento</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+        <tr>
+            <td class="table-info">31/12/2025 00:57</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">27/12/2025 12:07</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">27/12/2025 04:07</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2402</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">21/12/2025 08:11</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">17/12/2025 18:13</td>
+            <td class="table-danger text-end">404</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">07/12/2025 17:16</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2767</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">07/12/2025 00:24</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3918</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">06/12/2025 14:57</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">05/12/2025 02:26</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2044</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">03/12/2025 00:43</td>
+            <td class="table-danger text-end">404</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">02/12/2025 01:03</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">29/11/2025 23:45</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2372</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">23/11/2025 08:48</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3734</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">21/11/2025 18:09</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3732</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">19/11/2025 03:09</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3227</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">16/11/2025 19:08</td>
+            <td class="table-danger text-end">404</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">14/11/2025 03:20</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3741</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">07/11/2025 07:40</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3136</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">02/11/2025 04:31</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2246</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">30/10/2025 17:26</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3606</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">25/10/2025 01:04</td>
+            <td class="table-danger text-end">503</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">19/10/2025 22:38</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2294</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">19/10/2025 13:35</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">12/10/2025 06:44</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">10/10/2025 04:47</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2837</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">07/10/2025 16:37</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2271</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">02/10/2025 00:28</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">28/09/2025 14:44</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2736</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">28/09/2025 02:38</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">27/09/2025 23:03</td>
+            <td class="table-danger text-end">503</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">27/09/2025 22:58</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2594</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">26/09/2025 11:19</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3230</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">11/09/2025 21:18</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3633</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">26/08/2025 01:08</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2153</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">24/08/2025 14:20</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2592</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">10/08/2025 19:42</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2093</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">05/08/2025 22:33</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">03/08/2025 19:31</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">25/07/2025 01:35</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2933</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">21/07/2025 20:09</td>
+            <td class="table-danger text-end">404</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">21/07/2025 03:22</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3872</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">15/07/2025 21:55</td>
+            <td class="table-danger text-end">503</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">15/07/2025 11:38</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3366</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">28/06/2025 14:52</td>
+            <td class="table-danger text-end">503</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">26/06/2025 15:20</td>
+            <td class="table-danger text-end">503</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">24/06/2025 21:57</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2343</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">13/06/2025 05:06</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3145</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">08/06/2025 03:31</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2610</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">07/06/2025 08:12</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2514</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">05/06/2025 01:56</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3992</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">04/06/2025 19:12</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">04/06/2025 19:07</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2312</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">31/05/2025 17:43</td>
+            <td class="table-danger text-end">503</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">21/05/2025 14:40</td>
+            <td class="table-danger text-end">404</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">12/05/2025 12:16</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2126</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">06/05/2025 20:59</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3639</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">03/05/2025 12:17</td>
+            <td class="table-danger text-end">503</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">25/04/2025 14:10</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">23/04/2025 16:43</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2501</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">18/04/2025 21:55</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3091</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">05/04/2025 10:02</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">02/04/2025 02:56</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2783</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">02/04/2025 00:02</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2160</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">30/03/2025 01:03</td>
+            <td class="table-danger text-end">404</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">29/03/2025 03:34</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2274</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">25/03/2025 06:22</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2204</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">20/03/2025 10:55</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2035</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">17/03/2025 10:14</td>
+            <td class="table-danger text-end">404</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">17/03/2025 03:02</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">17/03/2025 02:05</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3410</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">16/03/2025 23:23</td>
+            <td class="table-danger text-end">404</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">15/03/2025 07:18</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3233</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">28/02/2025 09:18</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3217</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">26/02/2025 18:19</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3233</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">26/02/2025 08:34</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2033</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">19/02/2025 22:01</td>
+            <td class="table-danger text-end">503</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">15/02/2025 10:13</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">14/02/2025 02:26</td>
+            <td class="table-danger text-end">503</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">10/02/2025 20:26</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2573</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">08/02/2025 19:08</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3230</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">01/02/2025 00:26</td>
+            <td class="table-danger text-end">500</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">21/01/2025 21:00</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3499</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">18/01/2025 22:14</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2224</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">15/01/2025 15:30</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3079</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">14/01/2025 03:45</td>
+            <td class="table-danger text-end">503</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">14/01/2025 02:55</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2786</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">09/01/2025 18:08</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">3290</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">04/01/2025 13:47</td>
+            <td class="table-danger text-end">503</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">04/01/2025 13:42</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2510</td><td class="table-warning text-center">Degradación</td>
+        <tr>
+            <td class="table-info">02/01/2025 18:38</td>
+            <td class="table-danger text-end">503</td>
+            <td class="table-danger text-end">-</td><td class="table-danger text-center">Caída</td>
+        <tr>
+            <td class="table-info">01/01/2025 12:33</td>
+            <td class="table-success text-end">200</td>
+            <td class="table-warning text-end">2494</td><td class="table-warning text-center">Degradación</td>
+            </tbody>
+        </table>
+    </div>
+    
+            </main>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
