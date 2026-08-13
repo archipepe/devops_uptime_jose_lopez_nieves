@@ -14,8 +14,114 @@ def generate_site_links(sites):
         html += f'<a href="#site-{site}" class="list-group-item list-group-item-action">{site}</a>\n'
     return html
 
+def get_global_metrics():
+    conn = sqlite3.connect("monitor.db")
+    cur = conn.cursor()
+
+    # Disponibilidad global
+    cur.execute("""
+        SELECT 
+            SUM(CASE WHEN down = 1 THEN 1 ELSE 0 END),
+            COUNT(*)
+        FROM monitor
+    """)
+    minutos_caidos, minutos_totales = cur.fetchone()
+    disponibilidad = 1 - (minutos_caidos / minutos_totales)
+
+    # Latencia media global (solo códigos 200–299)
+    cur.execute("""
+        SELECT AVG(latency_ms)
+        FROM monitor
+        WHERE status_code BETWEEN 200 AND 299
+    """)
+    lat_media_global = cur.fetchone()[0]
+
+    # Top webs peor disponibilidad
+    cur.execute("""
+        SELECT url,
+               SUM(CASE WHEN down = 1 THEN 1 ELSE 0 END) AS caidos,
+               COUNT(*) AS total
+        FROM monitor
+        GROUP BY url
+        ORDER BY caidos DESC
+        LIMIT 5
+    """)
+    top_peor_disp = cur.fetchall()
+
+    # Top webs mayor latencia (solo códigos 200–299)
+    cur.execute("""
+        SELECT url, AVG(latency_ms) AS lat_media
+        FROM monitor
+        WHERE status_code BETWEEN 200 AND 299
+        GROUP BY url
+        ORDER BY lat_media DESC
+        LIMIT 5
+    """)
+    top_latencia = cur.fetchall()
+
+    # Caídas del día
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM monitor
+        WHERE down_event = 1
+          AND date(timestamp) = date('now', 'localtime')
+    """)
+    caidas_hoy = cur.fetchone()[0]
+
+    conn.close()
+
+    return {
+        "disponibilidad": disponibilidad,
+        "lat_media_global": lat_media_global,
+        "top_peor_disp": top_peor_disp,
+        "top_latencia": top_latencia,
+        "caidas_hoy": caidas_hoy
+    }
+
+def render_header(metrics):
+    disp_pct = round(metrics["disponibilidad"] * 100, 2)
+    lat_media = round(metrics["lat_media_global"], 2)
+
+    # Top webs peor disponibilidad
+    peor_disp_html = "".join([
+        f"<li>{url}: {round(caidos/total*100, 2)}%</li>"
+        for url, caidos, total in metrics["top_peor_disp"]
+    ])
+
+    # Top webs mayor latencia
+    peor_lat_html = "".join([
+        f"<li>{url}: {round(lat, 2)} ms</li>"
+        for url, lat in metrics["top_latencia"]
+    ])
+
+    return f"""
+    <div id="header" class="p-3">
+        <h2 class="mb-0">Panel de Monitorización</h2>
+
+        <div class="mt-3">
+            <span class="badge bg-success">Disponibilidad global: {disp_pct}%</span>
+            <span class="badge bg-primary">Latencia media global: {lat_media} ms</span>
+            <span class="badge bg-warning">Caídas hoy: {metrics["caidas_hoy"]}</span>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <h6>Top webs peor disponibilidad</h6>
+                <ul>{peor_disp_html}</ul>
+            </div>
+
+            <div class="col-md-6">
+                <h6>Top webs mayor latencia</h6>
+                <ul>{peor_lat_html}</ul>
+            </div>
+        </div>
+    </div>
+    """
+
 sites = get_sites()
 site_links = generate_site_links(sites)
+metrics = get_global_metrics()
+header_html = render_header(metrics)
 
 HTML = f"""
 <!DOCTYPE html>
@@ -46,10 +152,7 @@ HTML = f"""
 
 <body>
 
-    <div id="header" class="p-3">
-        <h2 class="mb-0">Panel de Monitorización</h2>
-        <small class="text-muted">Resumen global (Fase 3)</small>
-    </div>
+    {header_html}
 
     <!-- BOTÓN MÓVIL -->
     <button class="btn btn-primary d-md-none m-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarCanvas">
@@ -100,4 +203,4 @@ HTML = f"""
 with open("index.html", "w", encoding="utf-8") as f:
     f.write(HTML)
 
-print("index.html generado (Fase 2 completada)")
+print("index.html generado (Fase 3 completada)")

@@ -6,7 +6,7 @@ from datetime import datetime
 # CREAR TABLA monitor
 # -----------------------------
 
-conn = sqlite3.connect("../monitor.db")
+conn = sqlite3.connect("monitor.db")
 cur = conn.cursor()
 
 cur.execute("DROP TABLE IF EXISTS monitor;")

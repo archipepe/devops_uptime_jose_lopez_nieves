@@ -27,10 +27,29 @@
 
 <body>
 
+    
     <div id="header" class="p-3">
         <h2 class="mb-0">Panel de Monitorización</h2>
-        <small class="text-muted">Resumen global (Fase 3 lo rellenará)</small>
+
+        <div class="mt-3">
+            <span class="badge bg-success">Disponibilidad global: 99.98%</span>
+            <span class="badge bg-primary">Latencia media global: 550.82 ms</span>
+            <span class="badge bg-warning">Caídas hoy: 0</span>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <h6>Top webs peor disponibilidad</h6>
+                <ul><li>https://simulatehttpcode.vercel.app/: 0.02%</li></ul>
+            </div>
+
+            <div class="col-md-6">
+                <h6>Top webs mayor latencia</h6>
+                <ul><li>https://simulatehttpcode.vercel.app/: 550.82 ms</li></ul>
+            </div>
+        </div>
     </div>
+    
 
     <!-- BOTÓN MÓVIL -->
     <button class="btn btn-primary d-md-none m-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarCanvas">
@@ -44,8 +63,7 @@
             <nav id="sidebar" class="col-md-3 d-none d-md-block p-3 border-end">
                 <h5>Sitios monitorizados</h5>
                 <div class="list-group">
-                    <a href="#site-http://www.mytesturl.com/" class="list-group-item list-group-item-action">http://www.mytesturl.com/</a>
-<a href="#site-https://simulatehttpcode.vercel.app/" class="list-group-item list-group-item-action">https://simulatehttpcode.vercel.app/</a>
+                    <a href="#site-https://simulatehttpcode.vercel.app/" class="list-group-item list-group-item-action">https://simulatehttpcode.vercel.app/</a>
 
                 </div>
             </nav>
@@ -58,8 +76,7 @@
                 </div>
                 <div class="offcanvas-body">
                     <div class="list-group">
-                        <a href="#site-http://www.mytesturl.com/" class="list-group-item list-group-item-action">http://www.mytesturl.com/</a>
-<a href="#site-https://simulatehttpcode.vercel.app/" class="list-group-item list-group-item-action">https://simulatehttpcode.vercel.app/</a>
+                        <a href="#site-https://simulatehttpcode.vercel.app/" class="list-group-item list-group-item-action">https://simulatehttpcode.vercel.app/</a>
 
                     </div>
                 </div>
@@ -71,7 +88,7 @@
                 <p class="text-muted">En la Fase 3 y 4 se rellenará esta sección.</p>
 
                 <!-- CONTENEDORES VACÍOS POR SITIO -->
-                <div id="site-http://www.mytesturl.com/" class="mt-5"><h3>http://www.mytesturl.com/</h3><p class="text-muted">Aquí irán las métricas.</p></div><div id="site-https://simulatehttpcode.vercel.app/" class="mt-5"><h3>https://simulatehttpcode.vercel.app/</h3><p class="text-muted">Aquí irán las métricas.</p></div>
+                <div id="site-https://simulatehttpcode.vercel.app/" class="mt-5"><h3>https://simulatehttpcode.vercel.app/</h3><p class="text-muted">Aquí irán las métricas.</p></div>
             </main>
 
         </div>
