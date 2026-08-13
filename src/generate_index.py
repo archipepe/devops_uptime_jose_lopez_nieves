@@ -1,4 +1,21 @@
+import os
+import re
 import sqlite3
+import matplotlib.pyplot as plt
+
+def sanitize(url):
+    return re.sub(r'[^a-zA-Z0-9_-]', '_', url)
+
+def clean_assets():
+    folder = "assets"
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+        return
+
+    for filename in os.listdir(folder):
+        path = os.path.join(folder, filename)
+        if os.path.isfile(path):
+            os.remove(path)
 
 def get_sites():
     conn = sqlite3.connect("monitor.db")
@@ -234,6 +251,10 @@ def render_site_block(url, metrics):
         for ts, sc, lat, de, dg in metrics["eventos"]
     ])
 
+    disp_img = plot_disp_mensual(url, metrics["disp_mensual"])
+    lat_img = plot_latencia_diaria(url)
+    evt_img = plot_eventos(url)
+
     return f"""
     <div id="site-{url}" class="mt-5">
         <h3>{url}</h3>
@@ -253,6 +274,10 @@ def render_site_block(url, metrics):
         <p>Tiempo caído total: {metrics["tiempo_caido"]} minutos</p>
         <p>Tiempo degradado total: {metrics["tiempo_degradado"]} minutos</p>
 
+        <img src="{disp_img}" class="img-fluid mt-3">
+        <img src="{lat_img}" class="img-fluid mt-3">
+        <img src="{evt_img}" class="img-fluid mt-3">
+
         <h5 class="mt-4">Eventos</h5>
         <table class="table table-sm">
             <thead>
@@ -271,10 +296,95 @@ def render_site_block(url, metrics):
     </div>
     """
 
+def plot_disp_mensual(url, disp_mensual):
+    meses = [m for m, _, _ in disp_mensual]
+    valores = [round((1 - caidos/total)*100, 2) for _, caidos, total in disp_mensual]
+
+    plt.figure(figsize=(8,4))
+    plt.plot(meses, valores, marker='o')
+    plt.title(f"Disponibilidad mensual - {url}")
+    plt.ylabel("Disponibilidad (%)")
+    plt.xticks(rotation=45)
+    plt.grid(True)
+    filename = f"assets/{sanitize(url)}_disp.png"
+    plt.tight_layout()
+    plt.savefig(filename)
+    plt.close()
+    return filename
+
+def plot_latencia_diaria(url):
+    conn = sqlite3.connect("monitor.db")
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT date(timestamp), AVG(latency_ms)
+        FROM monitor
+        WHERE url = ?
+          AND status_code BETWEEN 200 AND 299
+        GROUP BY date(timestamp)
+        ORDER BY date(timestamp)
+    """, (url,))
+    rows = cur.fetchall()
+
+    if not rows:
+        return None
+
+    dias = [r[0] for r in rows]
+    lat = [round(r[1], 2) for r in rows]
+
+    plt.figure(figsize=(8,4))
+    plt.plot(dias, lat, marker='o', color='orange')
+    plt.title(f"Latencia media diaria - {url}")
+    plt.ylabel("Latencia (ms)")
+    plt.xticks(rotation=45)
+    plt.grid(True)
+    filename = f"assets/{sanitize(url)}_latencia.png"
+    plt.tight_layout()
+    plt.savefig(filename)
+    plt.close()
+    return filename
+
+def plot_eventos(url):
+    conn = sqlite3.connect("monitor.db")
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT date(timestamp),
+               SUM(CASE WHEN down_event = 1 THEN 1 ELSE 0 END),
+               SUM(CASE WHEN degraded_event = 1 THEN 1 ELSE 0 END)
+        FROM monitor
+        WHERE url = ?
+        GROUP BY date(timestamp)
+        ORDER BY date(timestamp)
+    """, (url,))
+    rows = cur.fetchall()
+
+    if not rows:
+        return None
+
+    dias = [r[0] for r in rows]
+    caidas = [r[1] for r in rows]
+    degrad = [r[2] for r in rows]
+
+    plt.figure(figsize=(8,4))
+    plt.bar(dias, caidas, label="Caídas", color="red")
+    plt.bar(dias, degrad, bottom=caidas, label="Degradaciones", color="gold")
+    plt.title(f"Eventos por día - {url}")
+    plt.ylabel("Eventos")
+    plt.xticks(rotation=45)
+    plt.legend()
+    plt.tight_layout()
+    filename = f"assets/{sanitize(url)}_eventos.png"
+    plt.savefig(filename)
+    plt.close()
+    return filename
+
+clean_assets()
+
 sites = get_sites()
 site_links = generate_site_links(sites)
-metrics = get_global_metrics()
-header_html = render_header(metrics)
+global_metrics = get_global_metrics()
+header_html = render_header(global_metrics)
 site_blocks = ""
 for s in sites:
     metrics = get_site_metrics(s)
@@ -360,4 +470,4 @@ HTML = f"""
 with open("index.html", "w", encoding="utf-8") as f:
     f.write(HTML)
 
-print("index.html generado (Fase 3 completada)")
+print("index.html generado (Fase 5 completada)")
