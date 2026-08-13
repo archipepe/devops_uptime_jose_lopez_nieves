@@ -118,10 +118,167 @@ def render_header(metrics):
     </div>
     """
 
+def get_site_metrics(url):
+    conn = sqlite3.connect("monitor.db")
+    cur = conn.cursor()
+
+    # Disponibilidad mensual
+    cur.execute("""
+        SELECT strftime('%Y-%m', timestamp), 
+               SUM(CASE WHEN down = 1 THEN 1 ELSE 0 END),
+               COUNT(*)
+        FROM monitor
+        WHERE url = ?
+        GROUP BY strftime('%Y-%m', timestamp)
+        ORDER BY strftime('%Y-%m', timestamp) DESC
+    """, (url,))
+    disp_mensual = cur.fetchall()
+
+    # Disponibilidad anual
+    cur.execute("""
+        SELECT strftime('%Y', timestamp), 
+               SUM(CASE WHEN down = 1 THEN 1 ELSE 0 END),
+               COUNT(*)
+        FROM monitor
+        WHERE url = ?
+        GROUP BY strftime('%Y', timestamp)
+        ORDER BY strftime('%Y', timestamp) DESC
+    """, (url,))
+    disp_anual = cur.fetchall()
+
+    # Latencia media
+    cur.execute("""
+        SELECT AVG(latency_ms)
+        FROM monitor
+        WHERE url = ?
+          AND status_code BETWEEN 200 AND 299
+    """, (url,))
+    lat_media = cur.fetchone()[0]
+
+    # Latencias para percentiles
+    cur.execute("""
+        SELECT latency_ms
+        FROM monitor
+        WHERE url = ?
+          AND status_code BETWEEN 200 AND 299
+        ORDER BY latency_ms
+    """, (url,))
+    latencias = [row[0] for row in cur.fetchall()]
+
+    def percentile(data, p):
+        if not data:
+            return None
+        k = int(len(data) * p)
+        return data[k]
+
+    p95 = percentile(latencias, 0.95)
+    p99 = percentile(latencias, 0.99)
+
+    # Tiempo caído
+    cur.execute("""
+        SELECT SUM(CASE WHEN down = 1 THEN 1 ELSE 0 END)
+        FROM monitor
+        WHERE url = ?
+    """, (url,))
+    tiempo_caido = cur.fetchone()[0]
+
+    # Tiempo degradado
+    cur.execute("""
+        SELECT SUM(CASE WHEN degraded = 1 THEN 1 ELSE 0 END)
+        FROM monitor
+        WHERE url = ?
+    """, (url,))
+    tiempo_degradado = cur.fetchone()[0]
+
+    # Eventos
+    cur.execute("""
+        SELECT timestamp, status_code, latency_ms, down_event, degraded_event
+        FROM monitor
+        WHERE url = ?
+          AND (down_event = 1 OR degraded_event = 1)
+        ORDER BY timestamp DESC
+    """, (url,))
+    eventos = cur.fetchall()
+
+    conn.close()
+
+    return {
+        "disp_mensual": disp_mensual,
+        "disp_anual": disp_anual,
+        "lat_media": lat_media,
+        "p95": p95,
+        "p99": p99,
+        "tiempo_caido": tiempo_caido,
+        "tiempo_degradado": tiempo_degradado,
+        "eventos": eventos
+    }
+
+def render_site_block(url, metrics):
+    # Disponibilidad mensual
+    disp_m_html = "".join([
+        f"<li>{mes}: {round((1 - caidos/total)*100, 2)}%</li>"
+        for mes, caidos, total in metrics["disp_mensual"]
+    ])
+
+    # Disponibilidad anual
+    disp_a_html = "".join([
+        f"<li>{año}: {round((1 - caidos/total)*100, 2)}%</li>"
+        for año, caidos, total in metrics["disp_anual"]
+    ])
+
+    # Eventos
+    eventos_html = "".join([
+        f"<tr><td>{ts}</td><td>{sc}</td><td>{lat}</td>"
+        f"<td>{'Sí' if de==1 else 'No'}</td>"
+        f"<td>{'Sí' if dg==1 else 'No'}</td></tr>"
+        for ts, sc, lat, de, dg in metrics["eventos"]
+    ])
+
+    return f"""
+    <div id="site-{url}" class="mt-5">
+        <h3>{url}</h3>
+
+        <h5 class="mt-4">Disponibilidad mensual</h5>
+        <ul>{disp_m_html}</ul>
+
+        <h5 class="mt-4">Disponibilidad anual</h5>
+        <ul>{disp_a_html}</ul>
+
+        <h5 class="mt-4">Latencia</h5>
+        <p>Media: {round(metrics["lat_media"], 2)} ms</p>
+        <p>P95: {metrics["p95"]} ms</p>
+        <p>P99: {metrics["p99"]} ms</p>
+
+        <h5 class="mt-4">Estado</h5>
+        <p>Tiempo caído total: {metrics["tiempo_caido"]} minutos</p>
+        <p>Tiempo degradado total: {metrics["tiempo_degradado"]} minutos</p>
+
+        <h5 class="mt-4">Eventos</h5>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Status</th>
+                    <th>Latencia</th>
+                    <th>Caída</th>
+                    <th>Degradación</th>
+                </tr>
+            </thead>
+            <tbody>
+                {eventos_html}
+            </tbody>
+        </table>
+    </div>
+    """
+
 sites = get_sites()
 site_links = generate_site_links(sites)
 metrics = get_global_metrics()
 header_html = render_header(metrics)
+site_blocks = ""
+for s in sites:
+    metrics = get_site_metrics(s)
+    site_blocks += render_site_block(s, metrics)
 
 HTML = f"""
 <!DOCTYPE html>
@@ -189,7 +346,7 @@ HTML = f"""
                 <p class="text-muted">En la Fase 3 y 4 se rellenará esta sección.</p>
 
                 <!-- CONTENEDORES VACÍOS POR SITIO -->
-                {"".join([f'<div id="site-{s}" class="mt-5"><h3>{s}</h3><p class="text-muted">Aquí irán las métricas.</p></div>' for s in sites])}
+                {site_blocks}
             </main>
 
         </div>
