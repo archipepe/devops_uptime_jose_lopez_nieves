@@ -2,7 +2,7 @@ name: Actualizar métricas
 
 on:
   schedule:
-    - cron: "*/5 * * * *" # Cada minuto
+    - cron: "*/5 * * * *" # Cada 5 minutos
   workflow_dispatch:
     
 
