@@ -1,5 +1,6 @@
 import os
 import re
+import locale
 import sqlite3
 import matplotlib.pyplot as plt
 
@@ -101,24 +102,28 @@ def render_header(metrics):
 
     # Top webs peor disponibilidad
     peor_disp_html = "".join([
-        f"<li>{url}: {round(caidos/total*100, 2)}%</li>"
+        f"<li>{url}: {locale.format_string('%.2f', round(caidos/total*100, 2))}%</li>"
         for url, caidos, total in metrics["top_peor_disp"]
     ])
 
     # Top webs mayor latencia
     peor_lat_html = "".join([
-        f"<li>{url}: {round(lat, 2)} ms</li>"
+        f"<li>{url}: {locale.format_string('%.2f', round(lat, 2))} ms</li>"
         for url, lat in metrics["top_latencia"]
     ])
+
+    badge_color_caidas_hoy = "bg-warning"
+    if metrics["caidas_hoy"] > 0:
+        badge_color_caidas_hoy = "bg-danger"
 
     return f"""
     <div id="header" class="p-3">
         <h2 class="mb-0">Panel de Monitorización</h2>
 
         <div class="mt-3">
-            <span class="badge bg-success">Disponibilidad global: {disp_pct}%</span>
-            <span class="badge bg-primary">Latencia media global: {lat_media} ms</span>
-            <span class="badge bg-warning">Caídas hoy: {metrics["caidas_hoy"]}</span>
+            <span class="badge bg-success">Disponibilidad global: {locale.format_string('%.2f', disp_pct)}%</span>
+            <span class="badge bg-primary">Latencia media global: {locale.format_string('%.2f', lat_media)} ms</span>
+            <span class="badge {badge_color_caidas_hoy}">Caídas hoy: {metrics["caidas_hoy"]}</span>
         </div>
 
         <div class="row mt-3">
@@ -141,12 +146,12 @@ def get_site_metrics(url):
 
     # Disponibilidad mensual
     cur.execute("""
-        SELECT strftime('%Y-%m', timestamp), 
+        SELECT strftime('%m/%Y', timestamp), 
                SUM(CASE WHEN down = 1 THEN 1 ELSE 0 END),
                COUNT(*)
         FROM monitor
         WHERE url = ?
-        GROUP BY strftime('%Y-%m', timestamp)
+        GROUP BY strftime('%m/%Y', timestamp)
         ORDER BY strftime('%Y-%m', timestamp) DESC
     """, (url,))
     disp_mensual = cur.fetchall()
@@ -209,7 +214,7 @@ def get_site_metrics(url):
 
     # Eventos
     cur.execute("""
-        SELECT timestamp, status_code, latency_ms, down_event, degraded_event
+        SELECT strftime('%d/%m/%Y %H:%M', timestamp), status_code, latency_ms, down_event, degraded_event
         FROM monitor
         WHERE url = ?
           AND (down_event = 1 OR degraded_event = 1)
@@ -233,21 +238,24 @@ def get_site_metrics(url):
 def render_site_block(url, metrics):
     # Disponibilidad mensual
     disp_m_html = "".join([
-        f"<li>{mes}: {round((1 - caidos/total)*100, 2)}%</li>"
+        f"<li>{mes}: {locale.format_string('%.2f', round((1 - caidos/total)*100, 2))}%</li>"
         for mes, caidos, total in metrics["disp_mensual"]
     ])
 
     # Disponibilidad anual
     disp_a_html = "".join([
-        f"<li>{año}: {round((1 - caidos/total)*100, 2)}%</li>"
+        f"<li>{año}: {locale.format_string('%.2f', round((1 - caidos/total)*100, 2))}%</li>"
         for año, caidos, total in metrics["disp_anual"]
     ])
 
     # Eventos
     eventos_html = "".join([
-        f"<tr><td>{ts}</td><td>{sc}</td><td>{lat}</td>"
-        f"<td>{'Sí' if de==1 else 'No'}</td>"
-        f"<td>{'Sí' if dg==1 else 'No'}</td></tr>"
+        f"""
+        <tr>
+            <td class="table-info">{ts}</td>
+            {'<td class="table-success text-end">' if sc in SUCCESS_RANGE else '<td class="table-danger text-end">'}{sc}</td>
+            {'<td class="table-danger text-end">' if sc not in SUCCESS_RANGE else '<td class="table-warning text-end">'}{lat if sc in SUCCESS_RANGE else '-'}</td>"""
+        f"{'<td class="table-danger text-center">Caída' if de==1 else ('<td class="table-warning text-center">Degradación' if dg==1 else '-')}</td>"
         for ts, sc, lat, de, dg in metrics["eventos"]
     ])
 
@@ -266,7 +274,7 @@ def render_site_block(url, metrics):
         <ul>{disp_a_html}</ul>
 
         <h5 class="mt-4">Latencia</h5>
-        <p>Media: {round(metrics["lat_media"], 2)} ms</p>
+        <p>Media: {locale.format_string('%.2f', round(metrics["lat_media"], 2))} ms</p>
         <p>P95: {metrics["p95"]} ms</p>
         <p>P99: {metrics["p99"]} ms</p>
 
@@ -274,19 +282,18 @@ def render_site_block(url, metrics):
         <p>Tiempo caído total: {metrics["tiempo_caido"]} minutos</p>
         <p>Tiempo degradado total: {metrics["tiempo_degradado"]} minutos</p>
 
-        <img src="{disp_img}" class="img-fluid mt-3">
-        <img src="{lat_img}" class="img-fluid mt-3">
-        <img src="{evt_img}" class="img-fluid mt-3">
+        <img src="{disp_img}" class="img-fluid mt-3 rounded border">
+        <img src="{lat_img}" class="img-fluid mt-3 rounded border">
+        <img src="{evt_img}" class="img-fluid mt-3 rounded border">
 
         <h5 class="mt-4">Eventos</h5>
-        <table class="table table-sm">
+        <table class="table table-sm table-stripped">
             <thead>
-                <tr>
-                    <th>Timestamp</th>
-                    <th>Status</th>
-                    <th>Latencia</th>
-                    <th>Caída</th>
-                    <th>Degradación</th>
+                <tr class="table-secondary">
+                    <th>Fecha y hora</th>
+                    <th class="text-end">Código</th>
+                    <th class="text-end">Latencia</th>
+                    <th class="text-center">Evento</th>
                 </tr>
             </thead>
             <tbody>
@@ -298,7 +305,7 @@ def render_site_block(url, metrics):
 
 def plot_disp_mensual(url, disp_mensual):
     meses = [m for m, _, _ in disp_mensual]
-    valores = [round((1 - caidos/total)*100, 2) for _, caidos, total in disp_mensual]
+    valores = [locale.format_string('%.2f', round((1 - caidos/total)*100, 2)) for _, caidos, total in disp_mensual]
 
     plt.figure(figsize=(8,4))
     plt.plot(meses, valores, marker='o')
@@ -317,11 +324,11 @@ def plot_latencia_diaria(url):
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT date(timestamp), AVG(latency_ms)
+        SELECT strftime('%d/%m/%Y', timestamp), AVG(latency_ms)
         FROM monitor
         WHERE url = ?
           AND status_code BETWEEN 200 AND 299
-        GROUP BY date(timestamp)
+        GROUP BY strftime('%d/%m/%Y', timestamp)
         ORDER BY date(timestamp)
     """, (url,))
     rows = cur.fetchall()
@@ -349,12 +356,12 @@ def plot_eventos(url):
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT date(timestamp),
+        SELECT strftime('%d/%m/%Y', timestamp),
                SUM(CASE WHEN down_event = 1 THEN 1 ELSE 0 END),
                SUM(CASE WHEN degraded_event = 1 THEN 1 ELSE 0 END)
         FROM monitor
         WHERE url = ?
-        GROUP BY date(timestamp)
+        GROUP BY strftime('%d/%m/%Y', timestamp)
         ORDER BY date(timestamp)
     """, (url,))
     rows = cur.fetchall()
@@ -378,6 +385,10 @@ def plot_eventos(url):
     plt.savefig(filename)
     plt.close()
     return filename
+
+SUCCESS_RANGE = range(200, 300)
+
+locale.setlocale(locale.LC_ALL, 'es_ES')
 
 clean_assets()
 
@@ -452,8 +463,6 @@ HTML = f"""
 
             <!-- PANEL DERECHO -->
             <main class="col-md-9 p-4">
-                <h4>Selecciona un sitio para ver sus métricas</h4>
-                <p class="text-muted">En la Fase 3 y 4 se rellenará esta sección.</p>
 
                 <!-- CONTENEDORES VACÍOS POR SITIO -->
                 {site_blocks}
