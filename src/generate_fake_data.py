@@ -6,12 +6,14 @@ from datetime import datetime, timedelta
 # CONFIGURACIÓN
 # -----------------------------
 
-YEAR = 2025
+YEAR_START = 2026
+YEAR_END = 2026
 SUCCESS_RANGE = range(200, 300)
-OUTPUT_FILE = "data_2025.csv"
+OUTPUT_FILE = "data_requests.csv"
 
 SITES = {
-    "site_a": "https://simulatehttpcode.vercel.app/"
+    "site_a": "https://simulatehttpcode.vercel.app/",
+    # "site_b": "https://www.wikipedia.com/"
 }
 
 # Peticiones cada minuto
@@ -19,10 +21,10 @@ INTERVAL_MINUTES = 1
 
 # Probabilidades de códigos
 STATUS_PROB = {
-    200: 0.96,
-    500: 0.02,
-    503: 0.01,
-    404: 0.01,
+    200: 0.93,
+    500: 0.03,
+    503: 0.02,
+    404: 0.02,
 }
 
 # -----------------------------
@@ -41,7 +43,7 @@ def choose_status():
 def simulate_latency(status):
     if status in SUCCESS_RANGE:
         # Normal o degradado
-        if random.random() < 0.05:  # 5% degradado
+        if random.random() < 0.07:  # 7% degradado
             return random.randint(2000, 4000)
         return random.randint(50, 800)
     else:
@@ -53,11 +55,11 @@ def simulate_latency(status):
 # -----------------------------
 
 def generate_year_data():
-    start = datetime(YEAR, 1, 1, 0, 0, 0)
-    end = datetime(YEAR, 12, 31, 23, 59, 59)
+    start = datetime(YEAR_START, 7, 1, 0, 0, 0)
+    end = datetime(YEAR_END, 9, 30, 23, 59, 59)
 
     current = start
-    id_counter = 1
+    id_counter = 1 # 132481
 
     # Estado por sitio
     site_state = {
